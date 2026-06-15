@@ -63,4 +63,5 @@ async def باند(ctx, member: discord.Member, *, reason="بدون سبب"):
     await ctx.send(f'🔨 صكينا {member.name} بأقوى باند! السبب: {reason}')
 
 # التوكن حقكِ جاهز ومثبت هنا
-bot.run('MTUxNTk3MzQ0MjU1NjY2MTk1MQ.Gvcb9h.Xk-DVOwpKH-abrH1Pr5thWLDMfuWPUgkruE-3s')
+import os
+bot.run(os.getenv('DISCORD_TOKEN'))
