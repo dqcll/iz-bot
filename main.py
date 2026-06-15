@@ -19,7 +19,7 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
-# 2. إعدادات البوت والـ Intents كاملة عشان اللوقز والأوامر
+# 2. إعدادات البوت والـ Intents كاملة
 intents = discord.Intents.default()
 intents.message_content = True  
 intents.members = True          
@@ -54,7 +54,6 @@ async def on_message_delete(message):
 @bot.event
 async def on_message_edit(before, after):
     if before.author.bot or before.content == after.content: return
-    log_channel = before.guild = before.guild # تصحيح تلقائي للـ guild
     log_channel = find_log_channel(before.guild)
     if log_channel:
         embed = discord.Embed(title="📝 رسالة عُدّلت", color=discord.Color.orange(), timestamp=datetime.datetime.utcnow())
@@ -84,12 +83,10 @@ async def on_member_remove(member):
 
 # ==================== [ أوامر الإدارة - MODERATION ] ====================
 
-# !اسكت [عضو] [دقائق اختياري] -> ميوت مؤقت أو مؤبد
 @bot.command()
 @commands.has_permissions(moderate_members=True)
 async def اسكت(ctx, member: discord.Member, minutes: int = None):
     if minutes is None:
-        # إذا ما كتبت المدة يكون مؤبد (ديسكورد يسمح بأقصى حد 28 يوم للتايم آوت)
         duration = datetime.timedelta(days=28)
         await member.timeout(duration, reason="ميوت مؤبد من البوت")
         await ctx.send(f"{member.mention} 🤐")
@@ -98,7 +95,6 @@ async def اسكت(ctx, member: discord.Member, minutes: int = None):
         await member.timeout(duration, reason=f"ميوت مؤقت لمدة {minutes} دقيقة")
         await ctx.send(f"{member.mention} تم إسكاته لمدة {minutes} دقيقة. 🤐")
 
-# !تايم [عضو] [دقائق] -> تايم آوت سريع
 @bot.command()
 @commands.has_permissions(moderate_members=True)
 async def تايم(ctx, member: discord.Member, minutes: int = 10):
@@ -106,28 +102,24 @@ async def تايم(ctx, member: discord.Member, minutes: int = 10):
     await member.timeout(duration, reason="تايم آوت")
     await ctx.send(f"تم إعطاء تايم آوت لـ {member.mention} لمدة {minutes} دقائق. ⏳")
 
-# !تكلم [عضو] -> يفك الإسكات والتايم آوت
 @bot.command()
 @commands.has_permissions(moderate_members=True)
 async def تكلم(ctx, member: discord.Member):
     await member.timeout(None)
     await ctx.send(f"تم فك الإسكات عن {member.mention}، اهرج براحتك. 🗣️")
 
-# !قفل -> يقفل الشات عن الأعضاء
 @bot.command()
 @commands.has_permissions(manage_channels=True)
 async def قفل(ctx):
     await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
     await ctx.send("🔒 تم قفل الشات بالكامل.")
 
-# !فتح -> يفتح الشات
 @bot.command()
 @commands.has_permissions(manage_channels=True)
 async def فتح(ctx):
     await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
     await ctx.send("🔓 تم فتح الشات، انطلقوا.")
 
-# !mute [عضو] -> ميوت بالروم الصوتي
 @bot.command()
 @commands.has_permissions(mute_members=True)
 async def mute(ctx, member: discord.Member):
@@ -137,7 +129,6 @@ async def mute(ctx, member: discord.Member):
     else:
         await ctx.send("هذا العضو ليس في روم صوتي حالياً!")
 
-# !unmute [عضو] -> فك الميوت الصوتي
 @bot.command()
 @commands.has_permissions(mute_members=True)
 async def unmute(ctx, member: discord.Member):
@@ -147,21 +138,18 @@ async def unmute(ctx, member: discord.Member):
     else:
         await ctx.send("هذا العضو ليس في روم صوتي حالياً!")
 
-# !مسح [العدد اختياري] -> يمسح الشات
 @bot.command()
 @commands.has_permissions(manage_messages=True)
 async def مسح(ctx, amount: int = 100):
     await ctx.channel.purge(limit=amount + 1)
     await ctx.send(f"🧹 تم مسح {amount} رسالة بنجاح.", delete_after=5)
 
-# !ban [عضو] -> باند أبدي
 @bot.command()
 @commands.has_permissions(ban_members=True)
 async def ban(ctx, member: discord.Member, *, reason=None):
     await member.ban(reason=reason)
     await ctx.send(f"🔨 طار باند مؤبد: {member.name} وما عاد يرجع.")
 
-# !unban [اسم العضو#0000 أو الآيدي] -> فك الباند
 @bot.command()
 @commands.has_permissions(ban_members=True)
 async def unban(ctx, *, member_name):
@@ -177,4 +165,4 @@ async def unban(ctx, *, member_name):
 # تشغيل البوت
 keep_alive()
 bot.run(os.getenv('DISCORD_TOKEN'))
-    
+        
